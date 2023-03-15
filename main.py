@@ -23,9 +23,24 @@ def compression(text):
 
     return compressed, [x[0] for x in frequencyOrdered]
 
+def deCompress(bitText, frequencyTable):
+    text = ""
+
+    getSize = lambda x: len(bin(x)) - 2
+
+    i = 0
+    for bit in bin(bitText)[3:]:
+        if bit == "1":
+            text += frequencyTable[i]
+            i = 0
+        else:
+            i += 1
+
+    return text
 
 def main():
-    print(compression("Hello World"))
+    text, lst = compression("Hello World")
+    print(deCompress(text, lst))
 
 if __name__ == "__main__":
     main()
