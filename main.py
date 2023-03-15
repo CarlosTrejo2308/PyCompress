@@ -1,3 +1,5 @@
+import sys
+
 def compression(text):
     frequencyCount = {}
 
@@ -21,12 +23,14 @@ def compression(text):
         # Inset the 1 for position
         compressed |= 1
 
-    return compressed, [x[0] for x in frequencyOrdered]
+    compressedRatio = (sys.getsizeof(compressed)* 100) / sys.getsizeof(text)
+    
+
+
+    return compressed, [x[0] for x in frequencyOrdered], compressedRatio
 
 def deCompress(bitText, frequencyTable):
     text = ""
-
-    getSize = lambda x: len(bin(x)) - 2
 
     i = 0
     for bit in bin(bitText)[3:]:
@@ -39,12 +43,18 @@ def deCompress(bitText, frequencyTable):
     return text
 
 def main():
-    text, lst = compression("Hello World")
-    print(deCompress(text, lst))
+    lore = open("aaa.txt", "r").read()
+    bitText, tree, cr = compression(lore)
+    print("Compression ratio: ", cr)
 
+    restored = deCompress(bitText, tree)
+
+    print(restored == lore)
+
+
+    print("Stats")
+    print("Original: ", sys.getsizeof(lore))
+    print("Compressed: ", sys.getsizeof(bitText))
+    print("Tree: ", sys.getsizeof(tree))
 if __name__ == "__main__":
     main()
-
-# (45226278521089, ['l', 'o', 'H', 'e', ' ', 'W', 'r', 'd'])
-# 001  0001   1     1    01
-# H      e      l    l    o   
