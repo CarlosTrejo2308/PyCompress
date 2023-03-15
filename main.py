@@ -1,4 +1,5 @@
 import sys
+import pickle
 
 def compression(text):
     frequencyCount = {}
@@ -24,8 +25,6 @@ def compression(text):
         compressed |= 1
 
     compressedRatio = (sys.getsizeof(compressed)* 100) / sys.getsizeof(text)
-    
-
 
     return compressed, [x[0] for x in frequencyOrdered], compressedRatio
 
@@ -43,18 +42,38 @@ def deCompress(bitText, frequencyTable):
     return text
 
 def main():
-    lore = open("aaa.txt", "r").read()
-    bitText, tree, cr = compression(lore)
-    print("Compression ratio: ", cr)
+    # Use the terminal to run this file
+    # First paramethor can be compress or decompress
+    # Second paramethor is the file name
 
-    restored = deCompress(bitText, tree)
+    if sys.argv[1] == "compress" or sys.argv[1] == "c":
+        inputFile = open(sys.argv[2], "r").read()
+        print("Compressing file...")
+        bitText, tree, cr = compression(inputFile)
+        print("Compression ratio: ", cr)
+        print("Writing to file...")
 
-    print(restored == lore)
+        filename = sys.argv[2].split(".")[0]
 
+        pickle.dump(bitText, open(filename + ".cp", "wb"))
+        pickle.dump(tree, open(filename + ".cp.tree", "wb"))
 
-    print("Stats")
-    print("Original: ", sys.getsizeof(lore))
-    print("Compressed: ", sys.getsizeof(bitText))
-    print("Tree: ", sys.getsizeof(tree))
+        print("Done!")
+
+    elif sys.argv[1] == "decompress" or sys.argv[1] == "d":
+        filename = sys.argv[2].split(".")[0]
+
+        bitText = pickle.load(open(filename + ".cp", "rb"))
+        tree = pickle.load(open(filename + ".cp.tree", "rb"))
+
+        print("Decompressing file...")
+
+        text = deCompress(bitText, tree)
+
+        print("Writing to file...")
+
+        open("restored_" + filename + ".txt", "w").write(text)
+
+        print("Done!")
 if __name__ == "__main__":
     main()
